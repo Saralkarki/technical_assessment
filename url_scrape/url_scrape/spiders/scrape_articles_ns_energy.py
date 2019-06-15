@@ -30,21 +30,24 @@ class dataSpider(scrapy.Spider):
             
     def parse_article(self, response):       
         items = ArticleItems()
-        
+        # scraping article title, date, body , image url and tags for the articles
         article_title = response.css('h1::text').extract()
         article_date = response.css("#date::text").extract()
-        article_body = response.xpath("//div[@class='td-post-content']/p/text()").extract()
+        article_body = response.xpath("//div[@class='cell small-12 medium-12 large-10']/p/text()").extract()
         article_body = ''.join(article_body)       
         image_link = response.xpath("//div[@class='cell small-12 medium-12 large-10']/img/@src").extract()
-        category_1 = response.xpath("//p[@class='tags']/span[1]/a/text()").extract()
-        category_2 = response.xpath("//p[@class='tags']/span[2]/a/text()").extract()
-        category_3 = response.xpath("//p[@class='tags']/span[3]/a/text()").extract()
+        category_1 = response.xpath("//p[@class='tags']/span[1]/a/text()").extract_first()
+        category_2 = response.xpath("//p[@class='tags']/span[2]/a/text()").extract_first()
+        category_3 = response.xpath("//p[@class='tags']/span[3]/a/text()").extract_first()
 
-#     # Get the list of URLs, for example:
+#     
         items['article_title'] = article_title
         items['article_date'] = article_date
         items['article_body'] = article_body
         items['image_link'] = image_link
+        items['category_1'] = category_1
+        items['category_2'] = category_2
+        items['category_3'] = category_3
 
         yield items
         
