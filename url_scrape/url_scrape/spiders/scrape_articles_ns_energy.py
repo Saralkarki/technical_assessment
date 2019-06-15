@@ -36,6 +36,9 @@ class dataSpider(scrapy.Spider):
         article_body = response.xpath("//div[@class='td-post-content']/p/text()").extract()
         article_body = ''.join(article_body)       
         image_link = response.xpath("//div[@class='cell small-12 medium-12 large-10']/img/@src").extract()
+        category_1 = response.xpath("//p[@class='tags']/span[1]/a/text()").extract()
+        category_2 = response.xpath("//p[@class='tags']/span[2]/a/text()").extract()
+        category_3 = response.xpath("//p[@class='tags']/span[3]/a/text()").extract()
 
 #     # Get the list of URLs, for example:
         items['article_title'] = article_title
