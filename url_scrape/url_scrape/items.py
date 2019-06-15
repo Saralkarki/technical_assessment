@@ -24,3 +24,4 @@ class ArticleItems(scrapy.Item):
     article_date = scrapy.Field()
     article_body = scrapy.Field()
     image_link = scrapy.Field()
+
