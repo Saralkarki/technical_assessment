@@ -1,6 +1,7 @@
 import scrapy
 import csv
 from ..items import ArticleItems
+import spacy
 
 url_list = []
 # import csv file with the urls from the NS ENERGY website
@@ -28,27 +29,36 @@ class dataSpider(scrapy.Spider):
         for link in links:
             yield scrapy.Request(link,self.parse_article)
             
-    def parse_article(self, response):       
+    def parse_article(self, response):    
+        nlp = spacy.load("en_core_web_sm")   
         items = ArticleItems()
         # scraping article title, date, body , image url and tags for the articles
         article_title = response.css('h1::text').extract()
         article_date = response.css("#date::text").extract()
-        article_body = response.xpath("//div[@class='cell small-12 medium-12 large-10']/p/text()").extract()
-        article_body = ''.join(article_body)       
+        article_content = response.xpath("//div[@class='cell small-12 medium-12 large-10']/p/text()").extract()
+        article_content = ''.join(article_content) 
+        
+        entity = nlp(article_content)
+        #scraping the countries and companies using spacy library
+        for ent in entity.ents:
+            if ent.label_ == 'ORG':
+                organisation = ent.text
+            if ent.label_ == 'GPE':
+                country = ent.text
         image_link = response.xpath("//div[@class='cell small-12 medium-12 large-10']/img/@src").extract()
         category_1 = response.xpath("//p[@class='tags']/span[1]/a/text()").extract_first()
         category_2 = response.xpath("//p[@class='tags']/span[2]/a/text()").extract_first()
         category_3 = response.xpath("//p[@class='tags']/span[3]/a/text()").extract_first()
-
-#     
-        items['article_title'] = article_title
-        items['article_date'] = article_date
-        items['article_body'] = article_body
+    
         items['image_link'] = image_link
         items['category_1'] = category_1
         items['category_2'] = category_2
         items['category_3'] = category_3
-
+        items['Country']   = country
+        items['Company'] = organisation
+        items['article_content'] = article_content
+        items['article_date'] = article_date
+        items['article_title'] = article_title
         yield items
         
    
